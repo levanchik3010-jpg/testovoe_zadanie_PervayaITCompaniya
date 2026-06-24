@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Редактирование</title>
+</head>
+<body class="container mt-5">
+    <div class="col-md-6 offset-md-3">
+        <h2>Редактирование записи</h2>
+        <form method="post" class="card p-4 shadow-sm">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Дата записи</label>
+                <input type="date" name="date" class="form-control" value="{{ record.date|date:'Y-m-md' }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Сумма (руб.)</label>
+                <input type="number" name="amount" class="form-control" value="{{ record.amount }}" required min="0">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Комментарий</label>
+                <input type="text" name="comment" class="form-control" value="{{ record.comment|default:'' }}">
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">Сохранить изменения</button>
+                <a href="{% url 'index' %}" class="btn btn-secondary">Назад</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Учет ДДС</title>
+</head>
+<body class="container mt-4">
+    <header class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Управление ДДС</h1>
+        <a href="/admin/" target="_blank" class="btn btn-outline-secondary">Управление справочниками (Админка)</a>
+    </header>
+
+    <div class="card mb-4 bg-light">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Фильтрация записей за период</h5>
+            <form method="get" class="row g-2 align-items-center">
+                <div class="col-md-2">
+                    <label class="form-label small text-muted mb-1">Дата начала (С)</label>
+                    <input type="date" name="start_date" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted mb-1">Дата окончания (По)</label>
+                    <input type="date" name="end_date" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted mb-1">Статус</label>
+                    <select name="status" class="form-select">
+                        <option value="">Все статусы</option>
+                        {% for s in statuses %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted mb-1">Тип операции</label>
+                    <select name="type" class="form-select">
+                        <option value="">Все типы</option>
+                        {% for t in types %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 pt-4">
+                    <button type="submit" class="btn btn-info w-100 text-white">Применить</button>
+                </div>
+                <div class="col-md-2 pt-4">
+                    <a href="{% url 'index' %}" class="btn btn-warning w-100 text-white">Сбросить</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Добавить новую запись</h5>
+            <form method="post" class="row g-2">
+                {% csrf_token %}
+                <div class="col-md-2"><input type="date" name="date" class="form-control" value="{{ today }}" required title="Дата создания"></div>
+                <div class="col-md-2">
+                    <select id="typeSelect" class="form-select" required>
+                        <option value="">Выберите тип</option>
+                        {% for t in types %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2"><select id="catSelect" class="form-select" required disabled><option value="">Категория</option></select></div>
+                <div class="col-md-2"><select name="sub_category" id="subCatSelect" class="form-select" required disabled><option value="">Подкатегория</option></select></div>
+                <div class="col-md-2">
+                    <select name="status" class="form-select" required>
+                        <option value="">Статус</option>
+                        {% for s in statuses %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-1"><input type="number" name="amount" class="form-control" placeholder="Сумма" required min="0"></div>
+                <div class="col-md-1"><input type="text" name="comment" class="form-control" placeholder="Инфо"></div>
+                <div class="col-12 mt-2"><button type="submit" class="btn btn-primary">Добавить запись</button></div>
+            </form>
+        </div>
+    </div>
+
+    <h2>Список операций</h2>
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr><th>Дата</th><th>Статус</th><th>Тип</th><th>Категория</th><th>Подкатегория</th><th>Сумма</th><th>Комментарий</th><th>Действия</th></tr>
+        </thead>
+        <tbody>
+            {% for r in records %}
+            <tr>
+                <td>{{ r.date|date:"d.m.Y" }}</td>
+                <td><span class="badge bg-secondary">{{ r.status.name }}</span></td>
+                <td>{{ r.sub_category.category.transaction_type.name }}</td>
+                <td>{{ r.sub_category.category.name }}</td>
+                <td>{{ r.sub_category.name }}</td>
+                <td><strong>{{ r.amount }} р.</strong></td>
+                <td><small class="text-muted">{{ r.comment|default:"—" }}</small></td>
+                <td>
+                    <a href="{% url 'edit_record' r.id %}" class="btn btn-sm btn-outline-primary">Ред.</a>
+                    <a href="{% url 'delete_record' r.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить запись?')">Удалить</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8" class="text-center text-muted">Записей не найдено</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        const typeSelect = document.getElementById('typeSelect');
+        const catSelect = document.getElementById('catSelect');
+        const subCatSelect = document.getElementById('subCatSelect');
+
+        typeSelect.onchange = async (e) => {
+            if(!e.target.value) { catSelect.disabled = true; subCatSelect.disabled = true; return; }
+            const data = await (await fetch(`/api/categories/?type_id=${e.target.value}`)).json();
+            catSelect.innerHTML = '<option value="">Выберите категорию</option>' + data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            catSelect.disabled = false;
+            subCatSelect.innerHTML = '<option value="">Сначала выберите категорию</option>';
+            subCatSelect.disabled = true;
+        };
+        catSelect.onchange = async (e) => {
+            if(!e.target.value) { subCatSelect.disabled = true; return; }
+            const data = await (await fetch(`/api/subcategories/?category_id=${e.target.value}`)).json();
+            subCatSelect.innerHTML = '<option value="">Выберите подкатегорию</option>' + data.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            subCatSelect.disabled = false;
+        };
+    </script>
+</body>
+</html>
