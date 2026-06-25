@@ -154,7 +154,10 @@
                         <td class="text-nowrap">
                             <a href="{% url 'edit_record' r.id %}" class="btn btn-sm btn-outline-primary py-0">Ред.</a>
                             <form method="post" action="{% url 'delete_record' r.id %}" class="d-inline"
-      onsubmit="return confirm('Удалить запись на {{ r.amount }} р.?')">
+                                  onsubmit="return confirm('Удалить запись на {{ r.amount }} р.?')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger py-0">Удал.</button>
+                            </form>
                         </td>
                     </tr>
                     {% empty %}
