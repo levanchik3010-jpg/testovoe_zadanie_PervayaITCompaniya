@@ -27,52 +27,60 @@
 
     <!-- Фильтры -->
     <div class="card mb-4 shadow-sm">
-        <div class="card-header bg-white fw-semibold">Фильтрация</div>
-        <div class="card-body">
-            <form method="get" class="row g-2 align-items-end">
-                <div class="col-md-2">
-                    <label class="form-label small mb-1">Дата с</label>
-                    <input type="date" name="start_date" class="form-control form-control-sm" value="{{ filter.start_date }}">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label small mb-1">Дата по</label>
-                    <input type="date" name="end_date" class="form-control form-control-sm" value="{{ filter.end_date }}">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label small mb-1">Статус</label>
-                    <select name="status" class="form-select form-select-sm">
-                        <option value="">Все</option>
-                        {% for s in statuses %}<option value="{{ s.id }}" {% if filter.status == s.id|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>{% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label small mb-1">Тип</label>
-                    <select name="type" id="filterType" class="form-select form-select-sm">
-                        <option value="">Все</option>
-                        {% for t in types %}<option value="{{ t.id }}" {% if filter.type == t.id|stringformat:"s" %}selected{% endif %}>{{ t.name }}</option>{% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label small mb-1">Категория</label>
-                    <select name="category" id="filterCategory" class="form-select form-select-sm">
-                        <option value="">Все</option>
-                        {% for c in categories %}<option value="{{ c.id }}" {% if filter.category == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label small mb-1">Подкатегория</label>
-                    <select name="subcategory" id="filterSubcategory" class="form-select form-select-sm">
-                        <option value="">Все</option>
-                        {% for s in subcategories %}<option value="{{ s.id }}" {% if filter.subcategory == s.id|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>{% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary btn-sm w-100">Применить</button>
-                </div>
-                <div class="col-md-1">
-                    <a href="{% url 'index' %}" class="btn btn-outline-secondary btn-sm w-100">Сброс</a>
-                </div>
-            </form>
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">Фильтрация</span>
+            <button class="btn btn-sm btn-outline-secondary" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#filterBody">
+                Показать / скрыть
+            </button>
+        </div>
+        <div class="collapse" id="filterBody">
+            <div class="card-body">
+                <form method="get" class="row g-2 align-items-end">
+                    <div class="col-md-2">
+                        <label class="form-label small mb-1">Дата с</label>
+                        <input type="date" name="start_date" class="form-control form-control-sm" value="{{ filter.start_date }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small mb-1">Дата по</label>
+                        <input type="date" name="end_date" class="form-control form-control-sm" value="{{ filter.end_date }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small mb-1">Статус</label>
+                        <select name="status" class="form-select form-select-sm">
+                            <option value="">Все</option>
+                            {% for s in statuses %}<option value="{{ s.id }}" {% if filter.status == s.id|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small mb-1">Тип</label>
+                        <select name="type" id="filterType" class="form-select form-select-sm">
+                            <option value="">Все</option>
+                            {% for t in types %}<option value="{{ t.id }}" {% if filter.type == t.id|stringformat:"s" %}selected{% endif %}>{{ t.name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small mb-1">Категория</label>
+                        <select name="category" id="filterCategory" class="form-select form-select-sm">
+                            <option value="">Все</option>
+                            {% for c in categories %}<option value="{{ c.id }}" {% if filter.category == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small mb-1">Подкатегория</label>
+                        <select name="subcategory" id="filterSubcategory" class="form-select form-select-sm">
+                            <option value="">Все</option>
+                            {% for s in subcategories %}<option value="{{ s.id }}" {% if filter.subcategory == s.id|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Применить</button>
+                    </div>
+                    <div class="col-md-1">
+                        <a href="{% url 'index' %}" class="btn btn-outline-secondary btn-sm w-100">Сброс</a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -172,6 +180,18 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Если есть активные фильтры — раскрываем блок автоматически
+    const hasActiveFilters = {{ filter.start_date|yesno:"true,false" }}
+        || {{ filter.end_date|yesno:"true,false" }}
+        || "{{ filter.status }}" !== ""
+        || "{{ filter.type }}" !== ""
+        || "{{ filter.category }}" !== ""
+        || "{{ filter.subcategory }}" !== "";
+
+    if (hasActiveFilters) {
+        document.getElementById('filterBody').classList.add('show');
+    }
+
     // --- Форма добавления: каскадные селекты ---
     const typeSelect = document.getElementById('typeSelect');
     const catSelect = document.getElementById('catSelect');
