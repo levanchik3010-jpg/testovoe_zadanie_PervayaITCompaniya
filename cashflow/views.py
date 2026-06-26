@@ -31,11 +31,11 @@ def index(request):
 
         errors = []
         if not sub_cat_id:
-            errors.append('Необходимо выбрать подкатегорию.')
+            errors.append('Выберите подкатегорию.')
         if not amount:
-            errors.append('Необходимо указать сумму.')
+            errors.append('Укажите сумму.')
         if not status_id:
-            errors.append('Необходимо выбрать статус.')
+            errors.append('Выберите статус.')
 
         if errors:
             for error in errors:
@@ -107,11 +107,11 @@ def edit_record(request, record_id):
 
         errors = []
         if not sub_cat_id:
-            errors.append('Необходимо выбрать подкатегорию.')
+            errors.append('Выберите подкатегорию.')
         if not amount:
-            errors.append('Необходимо указать сумму.')
+            errors.append('Укажите сумму.')
         if not status_id:
-            errors.append('Необходимо выбрать статус.')
+            errors.append('Выберите статус.')
 
         if errors:
             for error in errors:

@@ -116,7 +116,6 @@
             data.map(s => `<option value="${s.id}" ${s.id == selectedSubId ? 'selected' : ''}>${s.name}</option>`).join('');
     }
 
-    // При загрузке восстанавливаем текущие значения
     window.addEventListener('DOMContentLoaded', async () => {
         if (currentTypeId) {
             await loadCategories(currentTypeId, currentCatId);
